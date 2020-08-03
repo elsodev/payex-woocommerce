@@ -5,7 +5,7 @@
  * Description: Accept FPX and Card payments using Payex
  * Author: Nedex Solutions
  * Author URI: https://nedex.io
- * Version: 1.0.0
+ * Version: 1.0.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
