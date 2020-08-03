@@ -2,3 +2,4 @@
 .idea/payex-woocommerce.iml
 .idea/sshConfigs.xml
 .idea/webServers.xml
+vendor/*
