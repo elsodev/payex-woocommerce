@@ -1,5 +1,10 @@
 <?php
 /**
+ * Payex Gateway
+ *
+ * @package     payex_woocommerce_gateway
+ *
+ * @wordpress-plugin
  * Plugin Name: Payex Payment Gateway for Woocommerce
  * Plugin URI: https://payex.io
  * Description: Accept FPX and Card payments using Payex
@@ -21,11 +26,11 @@ add_filter( 'woocommerce_payment_gateways', 'payex_add_gateway_class' );
 /**
  * Add Payex Gateway
  *
- * @param string $gateways   Add Gateway
+ * @param  string $gateways Add Gateway.
  * @return mixed
  */
 function payex_add_gateway_class( $gateways ) {
-	$gateways[] = 'WC_Payex_Gateway';
+	 $gateways[] = 'WC_Payex_Gateway';
 	return $gateways;
 }
 // add plugin load for init payex gateway.
@@ -34,7 +39,6 @@ add_action( 'plugins_loaded', 'payex_init_gateway_class' );
  * Payex Init gateway function
  */
 function payex_init_gateway_class() {
-
 	/**
 	 * Class WC_PAYEX_GATEWAY
 	 */
@@ -54,7 +58,7 @@ function payex_init_gateway_class() {
 			$this->icon               = ''; // URL of the icon that will be displayed on checkout page near your gateway name.
 			$this->has_fields         = true; // in case you need a custom credit card form.
 			$this->method_title       = 'Payex Gateway';
-			$this->method_description = 'Accept FPX and Card payments using Payex Payment Gateway (payex.io)'; // will be displayed on the options page
+			$this->method_description = 'Accept FPX and Card payments using Payex Payment Gateway (payex.io)'; // will be displayed on the options page.
 
 			// gateways can support subscriptions, refunds, saved payment methods.
 			// but in this tutorial we begin with simple payments.
@@ -136,7 +140,7 @@ function payex_init_gateway_class() {
 		/**
 		 * Process Payment & generate Payex form link
 		 *
-		 * @param string $order_id
+		 * @param  string $order_id Woocommerce order id.
 		 * @return null|array
 		 */
 		public function process_payment( $order_id ) {
@@ -182,14 +186,18 @@ function payex_init_gateway_class() {
 		 * Webhook
 		 */
 		public function webhook() {
+			// phpcs:ignore
 			$verified = $this->verify_payex_response( $_POST );
 
+			// phpcs:ignore
 			if ( $verified && isset( $_POST['reference_number'] ) && isset( $_POST['auth_code'] ) ) {
+				// phpcs:ignore
 				$order     = wc_get_order( sanitize_text_field( wp_unslash( $_POST['reference_number'] ) ) );
+				// phpcs:ignore
 				$auth_code = sanitize_text_field( wp_unslash( $_POST['auth_code'] ) );
-				// verify the payment is successful
-				if ( $auth_code == PAYEX_AUTH_CODE_SUCCESS ) {
-					if ( ! $order->is_paid() ) { // only mark order as completed if the order was not paid before
+				// verify the payment is successful.
+				if ( PAYEX_AUTH_CODE_SUCCESS == $auth_code ) {
+					if ( ! $order->is_paid() ) { // only mark order as completed if the order was not paid before.
 						$order->payment_complete();
 						$order->reduce_order_stock();
 						$order->add_order_note( 'Payment completed with Payex', true );
@@ -205,19 +213,19 @@ function payex_init_gateway_class() {
 		/**
 		 * Generate Payment form link to allow users to Pay
 		 *
-		 * @param string      $ref_no Transaction record ref no.
-		 * @param float       $amount   Float amount.
-		 * @param string      $description    Describe this payment.
-		 * @param string      $cust_name  Name of Customer.
-		 * @param string      $cust_contact_no  Contact Number of Customer.
-		 * @param string      $email  Email Address of Customer.
-		 * @param string      $address  Physical Address of Customer.
-		 * @param string      $postcode  Postcode of Customer Address.
-		 * @param string      $state  State of Customer Address.
-		 * @param string      $country  Country code of Customer Address.
-		 * @param string      $return_url  Return URL when customer completed payment.
-		 * @param string      $callback_url  Return URL when customer completed payment.
-		 * @param string|null $token  Payex token.
+		 * @param  string      $ref_no          Transaction record ref no.
+		 * @param  float       $amount          Float amount.
+		 * @param  string      $description     Describe this payment.
+		 * @param  string      $cust_name       Name of Customer.
+		 * @param  string      $cust_contact_no Contact Number of Customer.
+		 * @param  string      $email           Email Address of Customer.
+		 * @param  string      $address         Physical Address of Customer.
+		 * @param  string      $postcode        Postcode of Customer Address.
+		 * @param  string      $state           State of Customer Address.
+		 * @param  string      $country         Country code of Customer Address.
+		 * @param  string      $return_url      Return URL when customer completed payment.
+		 * @param  string      $callback_url    Return URL when customer completed payment.
+		 * @param  string|null $token           Payex token.
 		 * @return string
 		 */
 		private function get_payex_payment_link( $ref_no, $amount, $description, $cust_name, $cust_contact_no, $email, $address, $postcode, $state, $country, $return_url, $callback_url, $token = null ) {
@@ -227,19 +235,19 @@ function payex_init_gateway_class() {
 
 			if ( $token ) {
 				$link = self::API_URL . self::API_PAYMENT_FORM
-					. '?token=' . $token
-					. '&amount=' . $amount
-					. '&description=' . urlencode( $description )
-					. '&customer_name=' . urlencode( $cust_name )
-					. '&contact_number=' . $cust_contact_no
-					. '&address=' . urlencode( $address )
-					. '&postcode=' . $postcode
-					. '&state=' . urlencode( $state )
-					. '&country=' . $country
-					. '&email=' . $email
-					. '&reference_number=' . $ref_no
-					. '&return_url=' . $return_url
-					. '&callback_url=' . $callback_url;
+				. '?token=' . $token
+				. '&amount=' . $amount
+				. '&description=' . rawurlencode( $description )
+				. '&customer_name=' . rawurlencode( $cust_name )
+				. '&contact_number=' . $cust_contact_no
+				. '&address=' . rawurlencode( $address )
+				. '&postcode=' . $postcode
+				. '&state=' . rawurlencode( $state )
+				. '&country=' . $country
+				. '&email=' . $email
+				. '&reference_number=' . $ref_no
+				. '&return_url=' . $return_url
+				. '&callback_url=' . $callback_url . '?_wpnonce=' . wp_create_nonce( $ref_no );
 
 				return $link;
 			}
@@ -269,7 +277,7 @@ function payex_init_gateway_class() {
 				)
 			);
 
-			if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
+			if ( is_wp_error( $request ) || 200 !== wp_remote_retrieve_response_code( $request ) ) {
 				error_log( print_r( $request, true ) );
 			} else {
 				$response = wp_remote_retrieve_body( $request );
@@ -285,8 +293,8 @@ function payex_init_gateway_class() {
 		 * Used to verify response data integrity
 		 * Signature: implode all returned data pipe separated then hash with sha512
 		 *
-		 * @param   array $response
-		 * @return  bool
+		 * @param  array $response  Payex response after checkout.
+		 * @return bool
 		 */
 		public function verify_payex_response( $response ) {
 			if ( isset( $response['signature'] ) && isset( $response['txn_id'] ) ) {

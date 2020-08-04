@@ -1,5 +1,3 @@
-.idea/deployment.xml
-.idea/payex-woocommerce.iml
-.idea/sshConfigs.xml
-.idea/webServers.xml
+.idea
+.idea/*
 vendor/*
