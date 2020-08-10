@@ -75,8 +75,7 @@ function payex_init_gateway_class() {
 
 			// This action hook saves the settings.
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
-
-			add_action( 'woocommerce_api_' . self::HOOK_NAME, array( $this, 'webhook' ) );
+			add_action( 'woocommerce_api_wc_payex_gateway', array( &$this, 'webhook' ) );
 		}
 
 		/**
@@ -186,14 +185,10 @@ function payex_init_gateway_class() {
 		 * Webhook
 		 */
 		public function webhook() {
-			// phpcs:ignore
 			$verified = $this->verify_payex_response( $_POST );
 
-			// phpcs:ignore
 			if ( $verified && isset( $_POST['reference_number'] ) && isset( $_POST['auth_code'] ) ) {
-				// phpcs:ignore
 				$order     = wc_get_order( sanitize_text_field( wp_unslash( $_POST['reference_number'] ) ) );
-				// phpcs:ignore
 				$auth_code = sanitize_text_field( wp_unslash( $_POST['auth_code'] ) );
 				// verify the payment is successful.
 				if ( PAYEX_AUTH_CODE_SUCCESS == $auth_code ) {
@@ -247,7 +242,7 @@ function payex_init_gateway_class() {
 				. '&email=' . $email
 				. '&reference_number=' . $ref_no
 				. '&return_url=' . $return_url
-				. '&callback_url=' . $callback_url . '?_wpnonce=' . wp_create_nonce( $ref_no );
+				. '&callback_url=' . WC()->api_request_url( get_class( $this ) );
 
 				return $link;
 			}
