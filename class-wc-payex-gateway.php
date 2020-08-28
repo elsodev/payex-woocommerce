@@ -5,12 +5,16 @@
  * @package     payex_woocommerce_gateway
  *
  * @wordpress-plugin
- * Plugin Name: Payex Payment Gateway for Woocommerce
- * Plugin URI: https://payex.io
- * Description: Accept FPX and Card payments using Payex
- * Author: Nedex Solutions
- * Author URI: https://nedex.io
- * Version: 1.0.1
+ * Plugin Name:       Payex Payment Gateway for Woocommerce
+ * Plugin URI:        https://payex.io
+ * Description:       Accept FPX and Card payments using Payex
+ * Version:           1.0.1
+ * Requires at least: 4.7
+ * Requires PHP:      7.0
+ * Author:            Nedex Solutions
+ * Author URI:        https://nedex.io
+ * License:           The MIT License (MIT)
+ * License URI:       https://opensource.org/licenses/MIT
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
