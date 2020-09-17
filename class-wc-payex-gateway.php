@@ -185,11 +185,11 @@ function payex_init_gateway_class() {
 		 * Webhook
 		 */
 		public function webhook() {
-			$verified = $this->verify_payex_response( $_POST );
+			$verified = $this->verify_payex_response( $_POST ); // phpcs:ignore
 
-			if ( $verified && isset( $_POST['reference_number'] ) && isset( $_POST['auth_code'] ) ) {
-				$order     = wc_get_order( sanitize_text_field( wp_unslash( $_POST['reference_number'] ) ) );
-				$auth_code = sanitize_text_field( wp_unslash( $_POST['auth_code'] ) );
+			if ( $verified && isset( $_POST['reference_number'] ) && isset( $_POST['auth_code'] ) ) {  // phpcs:ignore
+				$order     = wc_get_order( sanitize_text_field( wp_unslash( $_POST['reference_number'] ) ) );  // phpcs:ignore
+				$auth_code = sanitize_text_field( wp_unslash( $_POST['auth_code'] ) );  // phpcs:ignore
 				// verify the payment is successful.
 				if ( PAYEX_AUTH_CODE_SUCCESS == $auth_code ) {
 					if ( ! $order->is_paid() ) { // only mark order as completed if the order was not paid before.
