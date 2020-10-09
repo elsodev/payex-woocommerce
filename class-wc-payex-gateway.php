@@ -197,6 +197,7 @@ function payex_init_gateway_class() {
 
 				if ( ! $verified ) {
 					wc_add_notice( 'Error verifying nonce.', 'error' );
+					return;
 				}
 			}
 
