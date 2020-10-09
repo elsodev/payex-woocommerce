@@ -2,7 +2,7 @@
 /**
  * Payex Gateway
  *
- * @package     payex_woocommerce_gateway
+ * @package payex_woocommerce_gateway
  *
  * @wordpress-plugin
  * Plugin Name:       Payex Payment Gateway for Woocommerce
@@ -189,11 +189,22 @@ function payex_init_gateway_class() {
 		 * Webhook
 		 */
 		public function webhook() {
-			$verified = $this->verify_payex_response( $_POST ); // phpcs:ignore
+			if ( isset( $_POST['nonce'] ) && isset( $_POST['ref_no'] ) ) {
+				$verified = wp_verify_nonce(
+					sanitize_text_field( wp_unslash( $_POST['nonce'] ) ),
+					sanitize_text_field( wp_unslash( $_POST['ref_no'] ) )
+				);
 
-			if ( $verified && isset( $_POST['reference_number'] ) && isset( $_POST['auth_code'] ) ) {  // phpcs:ignore
-				$order     = wc_get_order( sanitize_text_field( wp_unslash( $_POST['reference_number'] ) ) );  // phpcs:ignore
-				$auth_code = sanitize_text_field( wp_unslash( $_POST['auth_code'] ) );  // phpcs:ignore
+				if ( ! $verified ) {
+					wc_add_notice( 'Error verifying nonce.', 'error' );
+				}
+			}
+
+			$verified = $this->verify_payex_response( $_POST );
+
+			if ( $verified && isset( $_POST['reference_number'] ) && isset( $_POST['auth_code'] ) ) {
+				$order     = wc_get_order( sanitize_text_field( wp_unslash( $_POST['reference_number'] ) ) );
+				$auth_code = sanitize_text_field( wp_unslash( $_POST['auth_code'] ) );
 				// verify the payment is successful.
 				if ( PAYEX_AUTH_CODE_SUCCESS == $auth_code ) {
 					if ( ! $order->is_paid() ) { // only mark order as completed if the order was not paid before.
@@ -245,6 +256,7 @@ function payex_init_gateway_class() {
 				. '&country=' . $country
 				. '&email=' . $email
 				. '&reference_number=' . $ref_no
+				. '&nonce=' . wp_create_nonce( $ref_no )
 				. '&return_url=' . $return_url
 				. '&callback_url=' . WC()->api_request_url( get_class( $this ) );
 
@@ -292,7 +304,7 @@ function payex_init_gateway_class() {
 		 * Used to verify response data integrity
 		 * Signature: implode all returned data pipe separated then hash with sha512
 		 *
-		 * @param  array $response  Payex response after checkout.
+		 * @param  array $response Payex response after checkout.
 		 * @return bool
 		 */
 		public function verify_payex_response( $response ) {
