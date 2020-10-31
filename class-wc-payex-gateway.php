@@ -59,7 +59,7 @@ function payex_init_gateway_class() {
 		public function __construct() {
 
 			$this->id                 = 'payex'; // payment gateway plugin ID.
-			$this->icon               = 'https://payexpublic.blob.core.windows.net/storage/logo.svg'; // URL of the icon that will be displayed on checkout page near your gateway name.
+			$this->icon               = 'https://payexpublic.blob.core.windows.net/storage/banner-772x250.png'; // URL of the icon that will be displayed on checkout page near your gateway name.
 			$this->has_fields         = true; // in case you need a custom credit card form.
 			$this->method_title       = 'Payex Gateway';
 			$this->method_description = 'Accept FPX and Card payments using Payex Payment Gateway (payex.io)'; // will be displayed on the options page.
