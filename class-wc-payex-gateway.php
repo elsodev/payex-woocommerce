@@ -50,7 +50,7 @@ function payex_init_gateway_class() {
 
 		const API_URL            = 'https://api.payex.io/';
 		const API_GET_TOKEN_PATH = 'api/Auth/Token';
-		const API_PAYMENT_FORM   = 'Payment/Details';
+		const API_PAYMENT_FORM   = 'Payment/Form';
 		const HOOK_NAME          = 'payex_hook';
 
 		/**
