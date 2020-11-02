@@ -8,7 +8,7 @@
  * Plugin Name:       Payex Payment Gateway for Woocommerce
  * Plugin URI:        https://payex.io
  * Description:       Accept FPX and Card payments using Payex
- * Version:           1.0.4
+ * Version:           1.0.5
  * Requires at least: 4.7
  * Requires PHP:      7.0
  * Author:            Nedex Solutions
@@ -63,7 +63,7 @@ function payex_init_gateway_class() {
 			$this->has_fields         = true; // in case you need a custom credit card form.
 			$this->method_title       = 'Payex Gateway';
 			$this->method_description = 'Accept FPX and Card payments using Payex Payment Gateway (payex.io)'; // will be displayed on the options page.
-            $this->order_button_text =  'Pay with Payex';
+            		$this->order_button_text  = 'Pay with Payex';
 
 			$this->supports = array(
 				'products',
@@ -74,6 +74,8 @@ function payex_init_gateway_class() {
 
 			// Load the settings.
 			$this->init_settings();
+			$this->title = $this->get_option( 'title' );
+			$this->description = $this->get_option( 'description' );
 			$this->enabled = $this->get_option( 'enabled' );
 
 			// This action hook saves the settings.
