@@ -102,13 +102,13 @@ function payex_init_gateway_class() {
 					'title'       => 'Title',
 					'type'        => 'text',
 					'description' => 'This controls the title which the user sees during checkout.',
-					'default'     => 'Payment Checkout',
+					'default'     => 'Payex',
 				),
 				'description' => array(
 					'title'       => 'Description',
 					'type'        => 'textarea',
 					'description' => 'This controls the description which the user sees during checkout.',
-					'default'     => 'Pay with Payex using FPX or Malaysian Credit Cards.',
+					'default'     => 'Pay via Payex using FPX, Visa or Mastercard.',
 				),
 				'testmode'     => array(
 					'title'       => 'Sandbox environment',
