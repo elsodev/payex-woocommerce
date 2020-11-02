@@ -49,6 +49,7 @@ function payex_init_gateway_class() {
 	class WC_PAYEX_GATEWAY extends WC_Payment_Gateway {
 
 		const API_URL            = 'https://api.payex.io/';
+		const API_URL_SANDBOX 	 = 'https://sandbox-payexapi.azurewebsites.net';
 		const API_GET_TOKEN_PATH = 'api/Auth/Token';
 		const API_PAYMENT_FORM   = 'Payment/Form';
 		const HOOK_NAME          = 'payex_hook';
@@ -77,6 +78,7 @@ function payex_init_gateway_class() {
 			$this->title = $this->get_option( 'title' );
 			$this->description = $this->get_option( 'description' );
 			$this->enabled = $this->get_option( 'enabled' );
+			$this->sandbox = 'yes' === $this->get_option( 'sandbox' );
 
 			// This action hook saves the settings.
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
@@ -107,6 +109,14 @@ function payex_init_gateway_class() {
 					'type'        => 'textarea',
 					'description' => 'This controls the description which the user sees during checkout.',
 					'default'     => 'Pay with Payex using FPX or Malaysian Credit Cards.',
+				),
+				'sandbox'     => array(
+					'title'       => 'Sandbox environment',
+					'label'       => 'Enable sandbox environment',
+					'type'        => 'checkbox',
+					'description' => 'Test our payment gateway in the sandbox environment using the sandbox Secret and the same email address.',
+					'default'     => 'no',
+					'desc_tip'    => true,
 				),
 				'email'       => array(
 					'title'       => 'Payex Email Address',
@@ -154,10 +164,16 @@ function payex_init_gateway_class() {
 			$order      = wc_get_order( $order_id );
 			$order_data = $order->get_data();
 			$token      = $this->get_payex_token();
-
+			$url = self::API_URL;
+				
+			if ($this->get_option( 'sandbox' ) === 'yes') {
+				$url = self::API_URL_SANDBOX;
+			}
+			
 			if ( $token ) {
 				// generate payex payment link.
 				$payment_link = $this->get_payex_payment_link(
+					$url,
 					$order_data['id'],
 					$order_data['total'],
 					'Payment for Order Reference:' . $order_data['order_key'],
@@ -228,13 +244,13 @@ function payex_init_gateway_class() {
 		 * @param  string|null $token           Payex token.
 		 * @return string
 		 */
-		private function get_payex_payment_link( $ref_no, $amount, $description, $cust_name, $cust_contact_no, $email, $address, $postcode, $state, $country, $return_url, $callback_url, $token = null ) {
+		private function get_payex_payment_link( $url, $ref_no, $amount, $description, $cust_name, $cust_contact_no, $email, $address, $postcode, $state, $country, $return_url, $callback_url, $token = null ) {
 			if ( ! $token ) {
 				$token = $this->getToken()['token'];
 			}
 
 			if ( $token ) {
-				$link = self::API_URL . self::API_PAYMENT_FORM
+				$link = $url . self::API_PAYMENT_FORM
 				. '?token=' . $token
 				. '&amount=' . $amount
 				. '&description=' . rawurlencode( $description )
