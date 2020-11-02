@@ -49,7 +49,7 @@ function payex_init_gateway_class() {
 	class WC_PAYEX_GATEWAY extends WC_Payment_Gateway {
 
 		const API_URL            = 'https://api.payex.io/';
-		const API_URL_SANDBOX 	 = 'https://sandbox-payexapi.azurewebsites.net';
+		const API_URL_SANDBOX 	 = 'https://sandbox-payexapi.azurewebsites.net/';
 		const API_GET_TOKEN_PATH = 'api/Auth/Token';
 		const API_PAYMENT_FORM   = 'Payment/Form';
 		const HOOK_NAME          = 'payex_hook';
