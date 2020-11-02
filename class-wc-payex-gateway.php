@@ -78,7 +78,7 @@ function payex_init_gateway_class() {
 			$this->title = $this->get_option( 'title' );
 			$this->description = $this->get_option( 'description' );
 			$this->enabled = $this->get_option( 'enabled' );
-			$this->sandbox = 'yes' === $this->get_option( 'sandbox' );
+			$this->testmode = 'yes' === $this->get_option( 'testmode' );
 
 			// This action hook saves the settings.
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
@@ -110,7 +110,7 @@ function payex_init_gateway_class() {
 					'description' => 'This controls the description which the user sees during checkout.',
 					'default'     => 'Pay with Payex using FPX or Malaysian Credit Cards.',
 				),
-				'sandbox'     => array(
+				'testmode'     => array(
 					'title'       => 'Sandbox environment',
 					'label'       => 'Enable sandbox environment',
 					'type'        => 'checkbox',
@@ -166,7 +166,7 @@ function payex_init_gateway_class() {
 			$token      = $this->get_payex_token();
 			$url = self::API_URL;
 				
-			if ($this->get_option( 'sandbox' ) === 'yes') {
+			if ($this->get_option( 'testmode' ) === 'yes') {
 				$url = self::API_URL_SANDBOX;
 			}
 			
