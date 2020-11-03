@@ -163,13 +163,13 @@ function payex_init_gateway_class() {
 			// we need it to get any order details.
 			$order      = wc_get_order( $order_id );
 			$order_data = $order->get_data();
-			$url = self::API_URL;
+			$url 	    = self::API_URL;
 				
 			if ($this->get_option( 'testmode' ) === 'yes') {
 				$url = self::API_URL_SANDBOX;
-            }
+            		}
             
-            $token      = $this->get_payex_token( $url );
+            		$token      = $this->get_payex_token( $url );
 			
 			if ( $token ) {
 				// generate payex payment link.
