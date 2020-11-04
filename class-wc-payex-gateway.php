@@ -64,7 +64,7 @@ function payex_init_gateway_class() {
 			$this->has_fields         = true; // in case you need a custom credit card form.
 			$this->method_title       = 'Payex Gateway';
 			$this->method_description = 'Accept FPX and Card payments using Payex Payment Gateway (payex.io)'; // will be displayed on the options page.
-            $this->order_button_text  = 'Pay with Payex';
+            		$this->order_button_text  = 'Pay via Payex';
 
 			$this->supports = array(
 				'products',
@@ -163,12 +163,13 @@ function payex_init_gateway_class() {
 			// we need it to get any order details.
 			$order      = wc_get_order( $order_id );
 			$order_data = $order->get_data();
-			$token      = $this->get_payex_token();
-			$url = self::API_URL;
+			$url 	    = self::API_URL;
 				
 			if ($this->get_option( 'testmode' ) === 'yes') {
 				$url = self::API_URL_SANDBOX;
-			}
+            		}
+            
+            		$token      = $this->get_payex_token( $url );
 			
 			if ( $token ) {
 				// generate payex payment link.
@@ -277,12 +278,12 @@ function payex_init_gateway_class() {
 		 *
 		 * @return bool|mixed
 		 */
-		private function get_payex_token() {
+		private function get_payex_token( $url ) {
 			$email  = $this->get_option( 'email' );
 			$secret = $this->get_option( 'secret_key' );
 
 			$request = wp_remote_post(
-				self::API_URL . self::API_GET_TOKEN_PATH,
+				$url . self::API_GET_TOKEN_PATH,
 				array(
 					'method'  => 'POST',
 					'timeout' => 45,
