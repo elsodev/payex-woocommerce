@@ -64,7 +64,7 @@ function payex_init_gateway_class() {
 			$this->has_fields         = true; // in case you need a custom credit card form.
 			$this->method_title       = 'Payex Gateway';
 			$this->method_description = 'Accept FPX and Card payments using Payex Payment Gateway (payex.io)'; // will be displayed on the options page.
-            		$this->order_button_text  = 'Pay with Payex';
+            $this->order_button_text  = 'Pay with Payex';
 
 			$this->supports = array(
 				'products',
