@@ -8,7 +8,7 @@
  * Plugin Name:       Payex Payment Gateway for Woocommerce
  * Plugin URI:        https://payex.io
  * Description:       Accept FPX and Card payments using Payex
- * Version:           1.0.5
+ * Version:           1.0.6
  * Requires at least: 4.7
  * Requires PHP:      7.0
  * Author:            Nedex Solutions
@@ -49,7 +49,7 @@ function payex_init_gateway_class() {
 	class WC_PAYEX_GATEWAY extends WC_Payment_Gateway {
 
 		const API_URL            = 'https://api.payex.io/';
-		const API_URL_SANDBOX 	 = 'https://sandbox-payexapi.azurewebsites.net/';
+		const API_URL_SANDBOX    = 'https://sandbox-payexapi.azurewebsites.net/';
 		const API_GET_TOKEN_PATH = 'api/Auth/Token';
 		const API_PAYMENT_FORM   = 'Payment/Form';
 		const HOOK_NAME          = 'payex_hook';
@@ -64,7 +64,7 @@ function payex_init_gateway_class() {
 			$this->has_fields         = true; // in case you need a custom credit card form.
 			$this->method_title       = 'Payex Gateway';
 			$this->method_description = 'Accept FPX and Card payments using Payex Payment Gateway (payex.io)'; // will be displayed on the options page.
-            $this->order_button_text  = 'Pay via Payex';
+			$this->order_button_text  = 'Pay via Payex';
 
 			$this->supports = array(
 				'products',
@@ -75,10 +75,10 @@ function payex_init_gateway_class() {
 
 			// Load the settings.
 			$this->init_settings();
-			$this->title = $this->get_option( 'title' );
+			$this->title       = $this->get_option( 'title' );
 			$this->description = $this->get_option( 'description' );
-			$this->enabled = $this->get_option( 'enabled' );
-			$this->testmode = 'yes' === $this->get_option( 'testmode' );
+			$this->enabled     = $this->get_option( 'enabled' );
+			$this->testmode    = 'yes' === $this->get_option( 'testmode' );
 
 			// This action hook saves the settings.
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
@@ -110,7 +110,7 @@ function payex_init_gateway_class() {
 					'description' => 'This controls the description which the user sees during checkout.',
 					'default'     => 'Pay via Payex using FPX, Visa or Mastercard.',
 				),
-				'testmode'     => array(
+				'testmode'    => array(
 					'title'       => 'Sandbox environment',
 					'label'       => 'Enable sandbox environment',
 					'type'        => 'checkbox',
@@ -163,14 +163,14 @@ function payex_init_gateway_class() {
 			// we need it to get any order details.
 			$order      = wc_get_order( $order_id );
 			$order_data = $order->get_data();
-			$url 	    = self::API_URL;
-				
-			if ($this->get_option( 'testmode' ) === 'yes') {
+			$url        = self::API_URL;
+
+			if ( $this->get_option( 'testmode' ) === 'yes' ) {
 				$url = self::API_URL_SANDBOX;
-            		}
-            
-            		$token      = $this->get_payex_token( $url );
-			
+			}
+
+					$token = $this->get_payex_token( $url );
+
 			if ( $token ) {
 				// generate payex payment link.
 				$payment_link = $this->get_payex_payment_link(
@@ -230,6 +230,7 @@ function payex_init_gateway_class() {
 		/**
 		 * Generate Payment form link to allow users to Pay
 		 *
+		 * @param  string      $url             Payex API URL.
 		 * @param  string      $ref_no          Transaction record ref no.
 		 * @param  float       $amount          Float amount.
 		 * @param  string      $description     Describe this payment.
@@ -241,11 +242,10 @@ function payex_init_gateway_class() {
 		 * @param  string      $state           State of Customer Address.
 		 * @param  string      $country         Country code of Customer Address.
 		 * @param  string      $return_url      Return URL when customer completed payment.
-		 * @param  string      $callback_url    Return URL when customer completed payment.
 		 * @param  string|null $token           Payex token.
 		 * @return string
 		 */
-		private function get_payex_payment_link( $url, $ref_no, $amount, $description, $cust_name, $cust_contact_no, $email, $address, $postcode, $state, $country, $return_url, $callback_url, $token = null ) {
+		private function get_payex_payment_link( $url, $ref_no, $amount, $description, $cust_name, $cust_contact_no, $email, $address, $postcode, $state, $country, $return_url, $token = null ) {
 			if ( ! $token ) {
 				$token = $this->getToken()['token'];
 			}
@@ -263,7 +263,7 @@ function payex_init_gateway_class() {
 				. '&country=' . $country
 				. '&email=' . $email
 				. '&reference_number=' . $ref_no
-				. '&source=wordpress'
+				. '&source=WordPress'
 				. '&return_url=' . $return_url
 				. '&callback_url=' . WC()->api_request_url( get_class( $this ) );
 
@@ -276,6 +276,7 @@ function payex_init_gateway_class() {
 		/**
 		 * Get Payex Token
 		 *
+		 * @param   string $url  Payex API Url.
 		 * @return bool|mixed
 		 */
 		private function get_payex_token( $url ) {
