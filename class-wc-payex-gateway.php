@@ -263,7 +263,7 @@ function payex_init_gateway_class() {
 				. '&country=' . $country
 				. '&email=' . $email
 				. '&reference_number=' . $ref_no
-				. '&source=WordPress'
+				. '&source=wordPress'
 				. '&return_url=' . $return_url
 				. '&callback_url=' . WC()->api_request_url( get_class( $this ) );
 
