@@ -186,7 +186,7 @@ function payex_init_gateway_class() {
 					$order_data['billing']['state'],
 					$order_data['billing']['country'],
 					$this->get_return_url( $order ),
-					get_site_url( null, '/wc-api/' . self::HOOK_NAME ),
+					WC()->api_request_url( get_class( $this ) ),
 					$token
 				);
 
@@ -242,6 +242,7 @@ function payex_init_gateway_class() {
 		 * @param  string      $state           State of Customer Address.
 		 * @param  string      $country         Country code of Customer Address.
 		 * @param  string      $return_url      Return URL when customer completed payment.
+		 * @param  string      $callback_url    Callback URL when customer completed payment.
 		 * @param  string|null $token           Payex token.
 		 * @return string
 		 */
