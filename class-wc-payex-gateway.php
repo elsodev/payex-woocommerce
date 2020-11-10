@@ -101,33 +101,33 @@ function payex_init_gateway_class() {
 				'title'       => array(
 					'title'       => 'Title',
 					'type'        => 'text',
-					'description' => 'This controls the title which the user sees during checkout.',
+					'description' => 'This controls the title which the user sees during checkout',
 					'default'     => 'Payex',
 				),
 				'description' => array(
 					'title'       => 'Description',
 					'type'        => 'textarea',
-					'description' => 'This controls the description which the user sees during checkout.',
+					'description' => 'This controls the description which the user sees during checkout',
 					'default'     => 'Pay via Payex using FPX, Visa or Mastercard.',
 				),
 				'testmode'    => array(
 					'title'       => 'Sandbox environment',
 					'label'       => 'Enable sandbox environment',
 					'type'        => 'checkbox',
-					'description' => 'Test our payment gateway in the sandbox environment using the sandbox Secret and the same email address.',
+					'description' => 'Test our payment gateway in the sandbox environment using the sandbox Secret and the same email address',
 					'default'     => 'no',
 					'desc_tip'    => true,
 				),
 				'email'       => array(
-					'title'       => 'Payex Email Address',
+					'title'       => 'Payex Email',
 					'type'        => 'text',
 					'description' => 'This email where by you used to sign up and login to Payex Portal',
 					'default'     => null,
 				),
 				'secret_key'  => array(
-					'title'       => 'Payex Live Secret Key',
+					'title'       => 'Payex Secret',
 					'type'        => 'password',
-					'description' => 'This key should be used when you are ready to go live. Obtain the secret key from Payex.',
+					'description' => 'This secret should be used when you are ready to go live. Obtain the secret from Payex Portal',
 				),
 			);
 		}
@@ -245,7 +245,7 @@ function payex_init_gateway_class() {
 		 * @param  string|null $token           Payex token.
 		 * @return string
 		 */
-		private function get_payex_payment_link( $url, $ref_no, $amount, $description, $cust_name, $cust_contact_no, $email, $address, $postcode, $state, $country, $return_url, $token = null ) {
+		private function get_payex_payment_link( $url, $ref_no, $amount, $description, $cust_name, $cust_contact_no, $email, $address, $postcode, $state, $country, $return_url, $callback_url, $token = null ) {
 			if ( ! $token ) {
 				$token = $this->getToken()['token'];
 			}
@@ -265,7 +265,7 @@ function payex_init_gateway_class() {
 				. '&reference_number=' . $ref_no
 				. '&source=wordPress'
 				. '&return_url=' . $return_url
-				. '&callback_url=' . WC()->api_request_url( get_class( $this ) );
+				. '&callback_url=' . $callback_url;
 
 				return $link;
 			}
