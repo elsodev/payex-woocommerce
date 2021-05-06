@@ -8,7 +8,7 @@
  * Plugin Name:       Payex Payment Gateway for Woocommerce
  * Plugin URI:        https://payex.io
  * Description:       Accept FPX and Card payments using Payex
- * Version:           1.0.9
+ * Version:           1.1.0
  * Requires at least: 4.7
  * Requires PHP:      7.0
  * Author:            Nedex Solutions
@@ -51,7 +51,7 @@ function payex_init_gateway_class() {
 		const API_URL            = 'https://api.payex.io/';
 		const API_URL_SANDBOX    = 'https://sandbox-payexapi.azurewebsites.net/';
 		const API_GET_TOKEN_PATH = 'api/Auth/Token';
-		const API_PAYMENT_FORM   = 'Payment/Form';
+		const API_PAYMENT_FORM   = 'api/v1/PaymentIntents';
 		const HOOK_NAME          = 'payex_hook';
 
 		/**
@@ -178,16 +178,7 @@ function payex_init_gateway_class() {
 				// generate payex payment link.
 				$payment_link = $this->get_payex_payment_link(
 					$url,
-					$order_data['id'],
-					$order_data['total'],
-					'Payment for Order Reference:' . $order_data['order_key'],
-					$order_data['billing']['first_name'] . ' ' . $order_data['billing']['last_name'],
-					$order_data['billing']['phone'],
-					$order_data['billing']['email'],
-					$order_data['billing']['address_1'] . ',' . $order_data['billing']['address_2'] . ', ' . $order_data['billing']['city'],
-					$order_data['billing']['postcode'],
-					$order_data['billing']['state'],
-					$order_data['billing']['country'],
+                    $order_data,
 					$this->get_return_url( $order ),
                     WC()->api_request_url( get_class( $this ) ),
 					$token
@@ -249,29 +240,52 @@ function payex_init_gateway_class() {
 		 * @param  string|null $token           Payex token.
 		 * @return string
 		 */
-		private function get_payex_payment_link( $url, $ref_no, $amount, $description, $cust_name, $cust_contact_no, $email, $address, $postcode, $state, $country, $return_url, $callback_url, $token = null ) {
+		private function get_payex_payment_link( $url, $order_data, $return_url, $callback_url, $token = null ) {
 			if ( ! $token ) {
 				$token = $this->getToken()['token'];
 			}
 
 			if ( $token ) {
-				$link = $url . self::API_PAYMENT_FORM
-				. '?token=' . $token
-				. '&amount=' . $amount
-				. '&description=' . rawurlencode( $description )
-				. '&customer_name=' . rawurlencode( $cust_name )
-				. '&contact_number=' . $cust_contact_no
-				. '&address=' . rawurlencode( $address )
-				. '&postcode=' . $postcode
-				. '&state=' . rawurlencode( $state )
-				. '&country=' . $country
-				. '&email=' . $email
-				. '&reference_number=' . $ref_no
-				. '&source=wordpress'
-				. '&return_url=' . $return_url
-				. '&callback_url=' . $callback_url;
+                $body = wp_json_encode( array( array(
+                    "amount" => $order_data['total'] * 100,
+                    "currency" => $order_data['currency'],
+                    "customer_id" => $order_data['customer_id'],
+                    "description" => 'Payment for Order Reference:' . $order_data['order_key'],
+                    "reference_number" => $order_data['id'],
+                    "customer_name" => $order_data['billing']['first_name'] . ' ' . $order_data['billing']['last_name'],
+                    "contact_number" => $order_data['billing']['phone'],
+                    "email" => $order_data['billing']['email'],
+                    "address" => $order_data['billing']['company'] . ' ' . $order_data['billing']['address_1'] . ',' . $order_data['billing']['address_2'],
+                    "postcode" => $order_data['billing']['postcode'],
+                    "city" => $order_data['billing']['city'],
+                    "state" => $order_data['billing']['state'],
+                    "country" => $order_data['billing']['country'],
+                    "return_url" => $return_url,
+                    "callback_url" => $callback_url,
+                    "source" => "wordpress"
+                ) ) );
+    
+                $request = wp_remote_post(
+                    $url . self::API_PAYMENT_FORM,
+                    array(
+                        'method'  => 'POST',
+                        'timeout' => 45,
+                        'headers' => array(
+                            'Content-Type'  => 'application/json',
+                            'Authorization' => 'Bearer ' . $token,
+                        ),
+                        'cookies' => array(),
+                        'body'    => $body
+                    )
+                );
 
-				return $link;
+                if ( is_wp_error( $request ) || 200 !== wp_remote_retrieve_response_code( $request ) ) {
+                    error_log( print_r( $request, true ) );
+                } else {
+                    $response = wp_remote_retrieve_body( $request );
+                    $response = json_decode( $response, true );
+                    return $response['result'][0][url];
+                }
 			}
 
 			return false;
