@@ -178,9 +178,9 @@ function payex_init_gateway_class() {
 				// generate payex payment link.
 				$payment_link = $this->get_payex_payment_link(
 					$url,
-                    $order_data,
+                    			$order_data,
 					$this->get_return_url( $order ),
-                    WC()->api_request_url( get_class( $this ) ),
+                    			WC()->api_request_url( get_class( $this ) ),
 					$token
 				);
 
@@ -225,16 +225,7 @@ function payex_init_gateway_class() {
 		 * Generate Payment form link to allow users to Pay
 		 *
 		 * @param  string      $url             Payex API URL.
-		 * @param  string      $ref_no          Transaction record ref no.
-		 * @param  float       $amount          Float amount.
-		 * @param  string      $description     Describe this payment.
-		 * @param  string      $cust_name       Name of Customer.
-		 * @param  string      $cust_contact_no Contact Number of Customer.
-		 * @param  string      $email           Email Address of Customer.
-		 * @param  string      $address         Physical Address of Customer.
-		 * @param  string      $postcode        Postcode of Customer Address.
-		 * @param  string      $state           State of Customer Address.
-		 * @param  string      $country         Country code of Customer Address.
+		 * @param  string      $order_data      Customer order data.
 		 * @param  string      $return_url      Return URL when customer completed payment.
 		 * @param  string      $callback_url    Callback URL when customer completed payment.
 		 * @param  string|null $token           Payex token.
@@ -246,46 +237,46 @@ function payex_init_gateway_class() {
 			}
 
 			if ( $token ) {
-                $body = wp_json_encode( array( array(
-                    "amount" => $order_data['total'] * 100,
-                    "currency" => $order_data['currency'],
-                    "customer_id" => $order_data['customer_id'],
-                    "description" => 'Payment for Order Reference:' . $order_data['order_key'],
-                    "reference_number" => $order_data['id'],
-                    "customer_name" => $order_data['billing']['first_name'] . ' ' . $order_data['billing']['last_name'],
-                    "contact_number" => $order_data['billing']['phone'],
-                    "email" => $order_data['billing']['email'],
-                    "address" => $order_data['billing']['company'] . ' ' . $order_data['billing']['address_1'] . ',' . $order_data['billing']['address_2'],
-                    "postcode" => $order_data['billing']['postcode'],
-                    "city" => $order_data['billing']['city'],
-                    "state" => $order_data['billing']['state'],
-                    "country" => $order_data['billing']['country'],
-                    "return_url" => $return_url,
-                    "callback_url" => $callback_url,
-                    "source" => "wordpress"
-                ) ) );
+                		$body = wp_json_encode( array( array(
+                    			"amount" => $order_data['total'] * 100,
+                    			"currency" => $order_data['currency'],
+                    			"customer_id" => $order_data['customer_id'],
+                    			"description" => 'Payment for Order Reference:' . $order_data['order_key'],
+                    			"reference_number" => $order_data['id'],
+                    			"customer_name" => $order_data['billing']['first_name'] . ' ' . $order_data['billing']['last_name'],
+                    			"contact_number" => $order_data['billing']['phone'],
+                    			"email" => $order_data['billing']['email'],
+                    			"address" => $order_data['billing']['company'] . ' ' . $order_data['billing']['address_1'] . ',' . $order_data['billing']['address_2'],
+                    			"postcode" => $order_data['billing']['postcode'],
+                    			"city" => $order_data['billing']['city'],
+                    			"state" => $order_data['billing']['state'],
+                    			"country" => $order_data['billing']['country'],
+                    			"return_url" => $return_url,
+                    			"callback_url" => $callback_url,
+                    			"source" => "wordpress"
+                		) ) );
     
-                $request = wp_remote_post(
-                    $url . self::API_PAYMENT_FORM,
-                    array(
-                        'method'  => 'POST',
-                        'timeout' => 45,
-                        'headers' => array(
-                            'Content-Type'  => 'application/json',
-                            'Authorization' => 'Bearer ' . $token,
-                        ),
-                        'cookies' => array(),
-                        'body'    => $body
-                    )
-                );
+                		$request = wp_remote_post(
+                    			$url . self::API_PAYMENT_FORM,
+                    			array(
+                        			'method'  => 'POST',
+                        			'timeout' => 45,
+                        			'headers' => array(
+                            				'Content-Type'  => 'application/json',
+                            				'Authorization' => 'Bearer ' . $token,
+                        			),
+                        			'cookies' => array(),
+                        			'body'    => $body
+                    			)
+                		);
 
-                if ( is_wp_error( $request ) || 200 !== wp_remote_retrieve_response_code( $request ) ) {
-                    error_log( print_r( $request, true ) );
-                } else {
-                    $response = wp_remote_retrieve_body( $request );
-                    $response = json_decode( $response, true );
-                    return $response['result'][0][url];
-                }
+                		if ( is_wp_error( $request ) || 200 !== wp_remote_retrieve_response_code( $request ) ) {
+                    			error_log( print_r( $request, true ) );
+                		} else {
+                    			$response = wp_remote_retrieve_body( $request );
+                    			$response = json_decode( $response, true );
+                    			return $response['result'][0][url];
+                		}
 			}
 
 			return false;
