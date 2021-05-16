@@ -172,17 +172,18 @@ function payex_init_gateway_class() {
 				$url = self::API_URL_SANDBOX;
 			}
 
-					$token = $this->get_payex_token( $url );
+			$token = $this->get_payex_token( $url );
 
 			if ( $token ) {
 				// generate payex payment link.
 				$payment_link = $this->get_payex_payment_link(
 					$url,
-                    			$order_data,
+                    $order_data,
 					$this->get_return_url( $order ),
-                    			WC()->api_request_url( get_class( $this ) ),
+					$order->get_checkout_payment_url(),
+                    WC()->api_request_url( get_class( $this ) ),
 					$token
-				);
+                );
 
 				// Redirect to checkout page on Payex.
 				return array(
@@ -226,12 +227,13 @@ function payex_init_gateway_class() {
 		 *
 		 * @param  string      $url             Payex API URL.
 		 * @param  string      $order_data      Customer order data.
-		 * @param  string      $return_url      Return URL when customer completed payment.
+		 * @param  string      $accept_url      Return URL when customer completed payment.
+		 * @param  string      $reject_url      Return URL when customer failed/cancelled payment.
 		 * @param  string      $callback_url    Callback URL when customer completed payment.
 		 * @param  string|null $token           Payex token.
 		 * @return string
 		 */
-		private function get_payex_payment_link( $url, $order_data, $return_url, $callback_url, $token = null ) {
+		private function get_payex_payment_link( $url, $order_data, $accept_url, $reject_url, $callback_url, $token = null ) {
 			if ( ! $token ) {
 				$token = $this->getToken()['token'];
 			}
@@ -251,11 +253,12 @@ function payex_init_gateway_class() {
                     			"city" => $order_data['billing']['city'],
                     			"state" => $order_data['billing']['state'],
                     			"country" => $order_data['billing']['country'],
-                    			"return_url" => $return_url,
+                    			"accept_url" => $accept_url,
+                    			"reject_url" => $reject_url,
                     			"callback_url" => $callback_url,
                     			"source" => "wordpress"
                 		) ) );
-    
+
                 		$request = wp_remote_post(
                     			$url . self::API_PAYMENT_FORM,
                     			array(
